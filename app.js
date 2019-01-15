@@ -4,4 +4,18 @@ const sayHi = function (request, response) {
   response.end();
 };
 
-module.exports = { sayHi };
+const requestHandler = function (request, response) {
+  if (request.url === "/hi") {
+    response.write("hello");
+    response.end();
+    return;
+  }
+  response.write("would u like to say hi?");
+  response.end();
+};
+
+
+module.exports = {
+  sayHi,
+  requestHandler,
+};
