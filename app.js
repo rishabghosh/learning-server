@@ -14,8 +14,19 @@ const requestHandler = function (request, response) {
   response.end();
 };
 
+const createCountListener = function (initialCount) {
+  return function (request, response) {
+    if (request.url === "/up") { initialCount++; }
+    if (request.url === "/down") { initialCount--; }
+    response.write(initialCount.toString());
+    response.end();
+    return;
+  };
+};
+
 
 module.exports = {
   sayHi,
   requestHandler,
+  createCountListener,
 };
