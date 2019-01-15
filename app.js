@@ -1,14 +1,9 @@
-const html = {
-  home: `<html>
-  <head><title>Your nickname</title></head>
-  <body>
-  <h1>home</h1>
-  </body>
-  </html>
-  `,
-};
+const reader = require("fs").readFileSync;
+
 
 const app = function(request, response){
+  const homePage = reader("./home_page.html", "utf8");
+  const html = { home: homePage };
   response.write(html.home);
   response.end();
   return;

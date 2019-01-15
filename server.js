@@ -1,5 +1,4 @@
 const http = require("http");
-const { createCountListener } = require("./counter.js");
 const { app } = require("./app.js");
 
 const PORT = 8001;
