@@ -1,9 +1,6 @@
 const http = require("http");
-const {
-  sayHi,
-  requestHandler,
-  createCountListener,
-} = require("./app.js");
+const { createCountListener } = require("./counter.js");
+const { app } = require("./app.js");
 
 const PORT = 8001;
 

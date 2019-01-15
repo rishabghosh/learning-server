@@ -1,19 +1,3 @@
-const sayHi = function (request, response) {
-  response.statusCode = 200;
-  response.write("hi");
-  response.end();
-};
-
-const requestHandler = function (request, response) {
-  if (request.url === "/hi") {
-    response.write("hello");
-    response.end();
-    return;
-  }
-  response.write("would u like to say hi?");
-  response.end();
-};
-
 class Counter {
   constructor(initialCount) {
     this.count = initialCount;
@@ -32,8 +16,6 @@ class Counter {
   }
 }
 
-
-
 const createCountListener = function (initialCount) {
   const counter = new Counter(initialCount);
   return function (request, response) {
@@ -47,8 +29,4 @@ const createCountListener = function (initialCount) {
 };
 
 
-module.exports = {
-  sayHi,
-  requestHandler,
-  createCountListener,
-};
+module.exports = { createCountListener, };
