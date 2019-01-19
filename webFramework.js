@@ -28,12 +28,10 @@ const handleData = function (req, res) {
   res.statusCode = 200;
   req.on("data", (chunk) => content += chunk);
   req.on("end", () => {
-    req.body = content;
     const message = "data given is -> " + content;
     res.write(message);
     res.end();
   });
-
 };
 
 const isMatching = function (req, route) {
@@ -44,7 +42,7 @@ const logRequest = function (req, res) {
   console.log("requested method ->", req.method);
   console.log("requested url -> ", req.url);
   console.log("headers =>", JSON.stringify(req.headers, null, 2));
-  console.log("body =>", req.body);
+  //console.log("body ->", req.body);
   console.log("\n ------ END ------- \n");
 };
 
@@ -57,12 +55,18 @@ const getRoutes = function () {
   return routes;
 };
 
-
-const webFramework = function () {
-  const app = function (req, res) {
-    const routes = getRoutes();
-    const matchingRoutes = routes.filter(isMatching.bind(null, req));
-
+class WebFramework {
+  constructor() {
+    this.routes = [];
+  }
+  get(url, handler) {
+    this.routes.push({ method: "GET", url, handler });
+  }
+  post(url, handler) {
+    this.routes.push({ method: "POST", url, handler });
+  }
+  handleRequest(req, res) {
+    const matchingRoutes = this.routes.filter(isMatching.bind(null, req));
     if (matchingRoutes.length > 0) {
       matchingRoutes[0].handler(req, res);
       logRequest(req, res);
@@ -70,10 +74,18 @@ const webFramework = function () {
     }
     logRequest(req, res);
     handleError(req, res);
-  };
-  return app;
+  }
+}
+
+const app = function (req, res) {
+  const webframe = new WebFramework();
+  webframe.get("/", handleHome);
+  webframe.get("/blue", handleBlue);
+  webframe.get("/red", handleRed);
+  webframe.post("/data", handleData)
+  webframe.handleRequest(req, res);
+
 };
 
-const app = webFramework();
 
 module.exports = { app };
