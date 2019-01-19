@@ -40,6 +40,13 @@ const isMatching = function (req, route) {
   return req.url === route.url && req.method === route.method;
 };
 
+const logRequest = function(req, res){
+  console.log("requested method ->", req.method);
+  console.log("requested url -> ", req.url);
+  console.log("headers =>", JSON.stringify(req.headers, null, 2));
+  console.log("body =>", req.body);
+};
+
 const webFrame = function (req, res) {
   const routes = [];
   routes.push({ method: "GET", url: "/", handler: handleHome });
@@ -49,6 +56,7 @@ const webFrame = function (req, res) {
 
   const matchingRoutes = routes.filter(isMatching.bind(null, req));
 
+  logRequest(req, res);
   if (matchingRoutes.length > 0) {
     matchingRoutes[0].handler(req, res);
     return;
