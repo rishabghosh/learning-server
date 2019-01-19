@@ -22,26 +22,23 @@ const handleError = function (req, res) {
   res.write("not found");
   res.end();
 };
-//make route of possible given url
-//extract matching url
-//
+
+const isMatching = function (req, route) {
+  console.log(route.method, req.method);
+  return req.url === route.url && req.method === route.method;
+};
+
 const webFrame = function (req, res) {
   const routes = [];
-  routes.push("/");
-  routes.push("/blue");
-  routes.push("/red");
+  routes.push({ method: "GET", url: "/" , handler: handleHome});
+  routes.push({ method: "GET", url: "/blue", handler: handleBlue });
+  routes.push({ method: "GET", url: "/red", handler: handleRed });
 
-  const handlers = {
-    "/": handleHome,
-    "/blue": handleBlue,
-    "/red": handleRed
-  };
-
-  const matchingRoutes = routes.filter(route => req.url === route);
+  const matchingRoutes = routes.filter(isMatching.bind(null, req));
+  console.log(matchingRoutes);
 
   if (matchingRoutes.length > 0) {
-    const handler = handlers[matchingRoutes[0]];
-    handler(req, res);
+    matchingRoutes[0].handler(req, res);
     return;
   }
   handleError(req, res);
