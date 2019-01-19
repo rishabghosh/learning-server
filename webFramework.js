@@ -23,7 +23,7 @@ const handleError = function (req, res) {
   res.end();
 };
 
-const handleData = function (req, res) {
+const handlePost = function (req, res) {
   let content = "";
   res.statusCode = 200;
   req.on("data", (chunk) => content += chunk);
@@ -51,34 +51,44 @@ const hasOnlyHandler = function (req, route) {
 };
 
 const isMatching = function (req, route) {
-  if (hasOnlyHandler(req, route)) return true;
+  if (hasOnlyHandler(req, route)) return true; //logRequest
   return req.url === route.url && req.method === route.method;
 };
 
 class WebFramework {
   constructor() {
     this.routes = [];
+    this.validUrls = [];
   }
+
   use(handler) {
     this.routes.push({ handler });
   }
+
   get(url, handler) {
     this.routes.push({ method: "GET", url, handler });
+    this.validUrls.push(url);
   }
+
   post(url, handler) {
     this.routes.push({ method: "POST", url, handler });
+    this.validUrls.push(url);
   }
+
   handleRequest(req, res) {
     const matchingRoutes = this.routes.filter(isMatching.bind(null, req));
-    console.log(matchingRoutes);
+
+    //pull if condition in a function
+    if (!this.validUrls.includes(req.url)) {
+      handleError(req, res);
+    }
+
     if (matchingRoutes.length > 0) {
       matchingRoutes[0].handler(req, res);
-      //  logRequest(req, res);
       return;
     }
-    //logRequest(req, res);
-    handleError(req, res);
   }
+
 }
 
 const app = function (req, res) {
@@ -87,11 +97,9 @@ const app = function (req, res) {
   webFramework.get("/", handleHome);
   webFramework.get("/blue", handleBlue);
   webFramework.get("/red", handleRed);
-  webFramework.post("/data", handleData);
+  webFramework.post("/data", handlePost);
   webFramework.use(logRequest);
   webFramework.handleRequest(req, res);
-
-
 };
 
 
