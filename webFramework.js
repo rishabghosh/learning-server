@@ -23,19 +23,31 @@ const handleError = function (req, res) {
   res.end();
 };
 
+const handleData = function (req, res) {
+  let content = "";
+  res.statusCode = 200;
+  req.on("data", (chunk) => content += chunk);
+  req.on("end", () => {
+    console.log(content);
+    const message = "data given is -> " + content;
+    res.write(message);
+    res.end();
+  });
+
+};
+
 const isMatching = function (req, route) {
-  console.log(route.method, req.method);
   return req.url === route.url && req.method === route.method;
 };
 
 const webFrame = function (req, res) {
   const routes = [];
-  routes.push({ method: "GET", url: "/" , handler: handleHome});
+  routes.push({ method: "GET", url: "/", handler: handleHome });
   routes.push({ method: "GET", url: "/blue", handler: handleBlue });
   routes.push({ method: "GET", url: "/red", handler: handleRed });
+  routes.push({ method: "POST", url: "/data", handler: handleData });
 
   const matchingRoutes = routes.filter(isMatching.bind(null, req));
-  console.log(matchingRoutes);
 
   if (matchingRoutes.length > 0) {
     matchingRoutes[0].handler(req, res);
