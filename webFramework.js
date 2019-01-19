@@ -53,34 +53,30 @@ const isMatching = function (req, route) {
 class WebFramework {
   constructor() {
     this.routes = [];
-    this.validUrls = [];
+    this.middlewareCount = 0;
   }
 
   use(handler) {
     this.routes.push({ handler });
+    this.middlewareCount++;
   }
 
   get(url, handler) {
     this.routes.push({ method: "GET", url, handler });
-    this.validUrls.push(url);
   }
 
   post(url, handler) {
     this.routes.push({ method: "POST", url, handler });
-    this.validUrls.push(url);
   }
 
   handleRequest(req, res) {
     const matchingRoutes = this.routes.filter(isMatching.bind(null, req));
-
-    //pull if condition in a function
-    if (!this.validUrls.includes(req.url)) {
+    matchingRoutes.forEach(route => route.handler(req, res));
+    if (matchingRoutes.length === this.middlewareCount) {
       handleError(req, res);
     }
-    matchingRoutes.forEach(route => route.handler(req, res));
     return;
   }
-
 }
 
 const app = function (req, res) {
