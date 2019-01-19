@@ -5,21 +5,32 @@
 	<title>Your nickname</title>
 
 	<style>
-
 		input {
 		font-size: 30px;
 		text-align: center;
 		border: 1px solid black;
 		padding: 5px;
 	}
-
 	</style>
+	<!--
+	<script language="javascript">
+		function check(form) {
+			console.log(form);
+			if (form.username.value == "micky" && form.password.value == "mouse") {
+				window.open("home_page.html")
+			}
+			else {
+				alert("Error Password or Username");
+			}
+		}
+	</script>
+-->
 </head>
 
 <body>
-	<form method="POST" action="">
-		<input type="text" name="FirstName" placeholder="username">
-		<input type="text" name="LastName" placeholder="password">
+	<form method="POST" action="/afterLogin">
+		<input type="text" name="username_1" placeholder="username">
+		<input type="text" name="password_1" placeholder="password">
 		<input type="submit" value="Login">
 	</form>
 
