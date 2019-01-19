@@ -1,4 +1,3 @@
-//app.get - method: GET, url, handler
 const handleBlue = function (req, res) {
   res.statusCode = 200;
   res.write("sky");
@@ -42,16 +41,12 @@ const logRequest = function (req, res) {
   console.log("\n ------ END ------- \n");
 };
 
-//if the route contains only handler - which is for logRequest
-//so if object doesnot have own property method and url
-//then the handler is logRequest
-
 const hasOnlyHandler = function (req, route) {
   return !(route.hasOwnProperty("method") && route.hasOwnProperty("url"));
 };
 
 const isMatching = function (req, route) {
-  if (hasOnlyHandler(req, route)) return true; //logRequest
+  if (hasOnlyHandler(req, route)) return true; //for middlewares like logRequest
   return req.url === route.url && req.method === route.method;
 };
 
@@ -82,11 +77,8 @@ class WebFramework {
     if (!this.validUrls.includes(req.url)) {
       handleError(req, res);
     }
-
-    if (matchingRoutes.length > 0) {
-      matchingRoutes[0].handler(req, res);
-      return;
-    }
+    matchingRoutes.forEach(route => route.handler(req, res));
+    return;
   }
 
 }
@@ -94,11 +86,11 @@ class WebFramework {
 const app = function (req, res) {
   const webFramework = new WebFramework();
 
+  webFramework.use(logRequest);
   webFramework.get("/", handleHome);
   webFramework.get("/blue", handleBlue);
   webFramework.get("/red", handleRed);
   webFramework.post("/data", handlePost);
-  webFramework.use(logRequest);
   webFramework.handleRequest(req, res);
 };
 
