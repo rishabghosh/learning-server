@@ -34,10 +34,6 @@ const handleData = function (req, res) {
   });
 };
 
-const isMatching = function (req, route) {
-  return req.url === route.url && req.method === route.method;
-};
-
 const logRequest = function (req, res) {
   console.log("requested method ->", req.method);
   console.log("requested url -> ", req.url);
@@ -46,18 +42,25 @@ const logRequest = function (req, res) {
   console.log("\n ------ END ------- \n");
 };
 
-const getRoutes = function () {
-  const routes = [];
-  routes.push({ method: "GET", url: "/", handler: handleHome });
-  routes.push({ method: "GET", url: "/blue", handler: handleBlue });
-  routes.push({ method: "GET", url: "/red", handler: handleRed });
-  routes.push({ method: "POST", url: "/data", handler: handleData });
-  return routes;
+//if the route contains only handler - which is for logRequest
+//so if object doesnot have own property method and url
+//then the handler is logRequest
+
+const hasOnlyHandler = function (req, route) {
+  return !(route.hasOwnProperty("method") && route.hasOwnProperty("url"));
+};
+
+const isMatching = function (req, route) {
+  if (hasOnlyHandler(req, route)) return true;
+  return req.url === route.url && req.method === route.method;
 };
 
 class WebFramework {
   constructor() {
     this.routes = [];
+  }
+  use(handler) {
+    this.routes.push({ handler });
   }
   get(url, handler) {
     this.routes.push({ method: "GET", url, handler });
@@ -67,23 +70,27 @@ class WebFramework {
   }
   handleRequest(req, res) {
     const matchingRoutes = this.routes.filter(isMatching.bind(null, req));
+    console.log(matchingRoutes);
     if (matchingRoutes.length > 0) {
       matchingRoutes[0].handler(req, res);
-      logRequest(req, res);
+      //  logRequest(req, res);
       return;
     }
-    logRequest(req, res);
+    //logRequest(req, res);
     handleError(req, res);
   }
 }
 
 const app = function (req, res) {
-  const webframe = new WebFramework();
-  webframe.get("/", handleHome);
-  webframe.get("/blue", handleBlue);
-  webframe.get("/red", handleRed);
-  webframe.post("/data", handleData)
-  webframe.handleRequest(req, res);
+  const webFramework = new WebFramework();
+
+  webFramework.get("/", handleHome);
+  webFramework.get("/blue", handleBlue);
+  webFramework.get("/red", handleRed);
+  webFramework.post("/data", handleData);
+  webFramework.use(logRequest);
+  webFramework.handleRequest(req, res);
+
 
 };
 
